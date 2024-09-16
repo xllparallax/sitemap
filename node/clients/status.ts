@@ -1,32 +1,32 @@
-import type { InstanceOptions, IOContext, IOResponse } from '@vtex/api'
-import { ExternalClient } from '@vtex/api'
+/* eslint-disable no-console */
+import type { InstanceOptions, IOContext } from '@vtex/api'
+import { JanusClient } from '@vtex/api'
 
-export default class Status extends ExternalClient {
-  constructor(context: IOContext, options?: InstanceOptions) {
-    super('http://httpstat.us', context, options)
+export default class Status extends JanusClient {
+  constructor({ host, ...rest }: IOContext, options?: InstanceOptions) {
+    super(
+      { ...rest, host: 'olimpica.myvtex.com' },
+      {
+        ...options,
+        headers: {
+          Accept: 'application/json',
+          VtexIdclientAutCookie: String(rest.storeUserAuthToken),
+          'x-vtex-user-agent': rest.userAgent,
+          ...options?.headers,
+        },
+      }
+    )
   }
 
-  public async getStatus(status: number): Promise<string> {
-    return this.http.get(status.toString(), {
-      metric: 'status-get',
-    })
+  public getCollecions = () => {
+    return this.http.get(this.routes.orderForm())
   }
 
-  public async getStatusWithHeaders(
-    status: number
-  ): Promise<IOResponse<string>> {
-    return this.http.getRaw(status.toString(), {
-      metric: 'status-get-raw',
-    })
-  }
+  private get routes() {
+    const base = '/api/dataentities'
 
-  public async getStatusAndForceMaxAge(
-    status: number
-  ): Promise<IOResponse<string>> {
-    return this.http.get(status.toString(), {
-      // when using an LRUCache, this will force the response to be cached
-      forceMaxAge: 5000,
-      metric: 'status-get-forceMaxAge',
-    })
+    return {
+      orderForm: () => `${base}/MP/scroll`,
+    }
   }
 }

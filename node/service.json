@@ -1,13 +1,17 @@
 {
   "memory": 256,
   "ttl": 10,
-  "timeout": 2,
+  "timeout": 8600,
   "minReplicas": 2,
   "maxReplicas": 4,
   "workers": 1,
   "routes": {
     "status": {
-      "path": "/_v/status/:code",
+      "path": "/sitemap/nebula/collections.xml",
+      "public": true
+    },
+    "test": {
+      "path": "/masterdata/collections",
       "public": true
     }
   }
